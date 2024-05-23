@@ -3,7 +3,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import Footer from "app/components/Footer";
 import Header from "app/components/Header";
 import { baseUrl } from "app/utils/constants";
-import { clsx } from "clsx";
+import clsx from "clsx";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
