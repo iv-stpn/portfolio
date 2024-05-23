@@ -45,7 +45,7 @@ export default async function Header() {
                     <div className={itemsClass}>
                         <Link href={`/${locale}/`} className="flex gap-1.5 items-center">
                             <span className="font-semibold">{t("name")}</span>
-                            <span className={clsx(firaCode.className, "text-base md:text-xs font-medium")}>
+                            <span className={clsx(firaCode.className, "hidden md:inline text-xs font-medium")}>
                                 &lt;{t("nickname")}/&gt;
                             </span>
                         </Link>
