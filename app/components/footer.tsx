@@ -1,61 +1,95 @@
-function ArrowIcon() {
-  return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 12 12"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M2.07102 11.3494L0.963068 10.2415L9.2017 1.98864H2.83807L2.85227 0.454545H11.8438V9.46023H10.2955L10.3097 3.09659L2.07102 11.3494Z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
+import { RiArrowRightUpLine } from "@remixicon/react";
+import { useLocale, useTranslations } from "next-intl";
+import Image from "next/image";
+import ExternalLink from "./common/ExternalLink";
+import UnderlineLink from "./common/UnderlineLink";
 
 export default function Footer() {
-  return (
-    <footer className="mb-16">
-      <ul className="font-sm mt-8 flex flex-col space-x-0 space-y-2 text-neutral-600 md:flex-row md:space-x-4 md:space-y-0 dark:text-neutral-300">
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="/rss"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">rss</p>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="https://github.com/vercel/next.js"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">github</p>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center transition-all hover:text-neutral-800 dark:hover:text-neutral-100"
-            rel="noopener noreferrer"
-            target="_blank"
-            href="https://vercel.com/templates/next.js/portfolio-starter-kit"
-          >
-            <ArrowIcon />
-            <p className="ml-2 h-7">view source</p>
-          </a>
-        </li>
-      </ul>
-      <p className="mt-8 text-neutral-600 dark:text-neutral-300">
-        © {new Date().getFullYear()} MIT Licensed
-      </p>
-    </footer>
-  )
+    const locale = useLocale();
+    const t = useTranslations("Links");
+
+    return (
+        <footer className="pt-16 pb-40 mmd:pb-12 bg-gray-100 dark:bg-neutral-900 transition-[background-color] duration-[300ms] text-xl leading-relaxed">
+            <div className="contained pad-screen flex items-center gap-6 mb-16">
+                <div className="flex relative">
+                    <Image
+                        src="/img/iv-stpn.png"
+                        alt="Photo de profil"
+                        width={200}
+                        height={200}
+                        className="brightness-125 z-10 shrink-0 rounded-full w-12 h-12"
+                    />
+                    <div className="absolute bg-primary rounded-full w-12 h-12" />
+                </div>
+                <h1 className="title">Ivan Stepanian</h1>
+            </div>
+            {/* <div className="contained pad-screen mb-10">
+                <h2 className="opacity-50">Ma mission</h2>
+                <p></p>
+            </div> */}
+            <div className="contained pad-screen flex flex-col md:flex-row gap-16 lg:gap-24 mb-16">
+                <div>
+                    <h2 className="opacity-50 mb-2">{t("social")}</h2>
+                    <ul>
+                        <li>
+                            <UnderlineLink href={t("linkedin")} external>
+                                LinkedIn
+                            </UnderlineLink>
+                        </li>
+                        <li>
+                            <UnderlineLink href={t("github")} external>
+                                GitHub
+                            </UnderlineLink>
+                        </li>
+                        <li>
+                            <UnderlineLink href={t("malt")} external>
+                                Malt
+                            </UnderlineLink>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 className="opacity-50 mb-2">{t("contact")}</h2>
+                    <ul>
+                        <li>
+                            <UnderlineLink href={t("mailto")} external>
+                                {t("email")}
+                            </UnderlineLink>
+                        </li>
+                        <li>
+                            <UnderlineLink href={t("tel")} external>
+                                {t("telephone")}
+                            </UnderlineLink>
+                        </li>
+                        <li>
+                            <UnderlineLink href={`/${locale}/contact`}>{t("get-a-quote")}</UnderlineLink>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h2 className="opacity-50 mb-2">{t("legal")}</h2>
+                    <ul>
+                        <li>
+                            {t("company")} {t("company-vat")}
+                        </li>
+                        <li>
+                            {t("company-street")}, {t("company-city")}
+                        </li>
+                        <li>
+                            {t("company-number")} — {t("company-register")}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div className="contained pad-screen">
+                <p className="opacity-50">{t("creator")}</p>
+                <div>
+                    {t.rich("license", {
+                        repository: (children) => <ExternalLink href={t("repository")}>{children}</ExternalLink>,
+                    })}
+                    <RiArrowRightUpLine className="w-5 h-5 inline mb-1 ml-1" />
+                </div>
+            </div>
+        </footer>
+    );
 }

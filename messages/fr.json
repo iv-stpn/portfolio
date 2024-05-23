@@ -1,0 +1,141 @@
+{
+    "Metadata": {
+        "template": "%s :: Ivan Stepanian",
+        "default": "Portfolio :: Ivan Stepanian",
+        "title": "Ivan Stepanian :: Ingénieur Freelance Data & Full-Stack",
+        "locale": "fr_FR",
+        "description": "Je suis Ivan Stepanian, ingénieur data full-stack freelance basé sur Paris. Passionné par la résolution de problèmes et l'ingénierie de produits, j'aide les entreprises en big data, développement web et data scraping."
+    },
+    "Header": {
+        "name": "Ivan Stepanian",
+        "nickname": "iv-stpn",
+        "tabs": {
+            "about-me": "À propos",
+            "resume": "CV",
+            "blog": "Blog",
+            "contact": "Contact"
+        }
+    },
+    "DarkModeToggle": {
+        "label": "Mode sombre"
+    },
+    "Index": {
+        "titles": {
+            "home": "Ingénieur data full-stack<br></br>& développeur freelance",
+            "articles": "Derniers articles",
+            "services": "Je peux vous aider en...",
+            "contact": "Travaillons ensemble"
+        },
+        "subtitle": "Passionné par la résolution de problèmes, l'analyse de besoins métiers et l'ingénierie de produits, je suis en quête de nouveaux défis.",
+        "details": "Polyvalent & rigoureux, mes compétences vont d'ingénieur data (<pandas>Pandas</pandas>, <scala>Scala</scala>, <spark>Spark</spark>, <azure>Azure MLOps</azure>...) à webdev full-stack (<react>React</react>, <nextjs>Next14</nextjs>, <nestjs>NestJS</nestjs>, <kubernetes>Kubernetes</kubernetes>...), me donnant une vision à 360° des produits digitaux modernes.",
+        "work-together": "Collaborons ensemble !",
+        "links": {
+            "pandas": "https://pandas.pydata.org",
+            "scala": "https://docs.scala-lang.org/fr/tour/tour-of-scala.html",
+            "spark": "https://spark.apache.org",
+            "azure": "https://azure.microsoft.com/fr-fr/products/machine-learning/mlops/",
+            "react": "https://fr.react.dev",
+            "nextjs": "https://nextjs.org/docs/app/building-your-application/routing",
+            "nestjs": "https://docs.nest-js.fr",
+            "kubernetes": "https://kubernetes.io/fr/docs/concepts/overview/what-is-kubernetes/"
+        },
+        "freelancing": {
+            "rating": "5,0",
+            "platform": "sur Malt",
+            "tags": {
+                "experience": "3+ ans d'expérience",
+                "projects": "10+ projets"
+            }
+        },
+        "services": {
+            "data": {
+                "title": "Big Data",
+                "content": "Ingénieur big data & machine learning de formation, je maîtrise les pipelines ETL avec la stack Apache. J'utilise plotly, R pour la data visualisation & TF/Keras pour le ML."
+            },
+            "web": {
+                "title": "Web Development",
+                "content": "Full-Stack avec Expo/React Native & NestJS, Next.js 14 (app directory avec API Routes). Sensible à l'UX/UI, j'assiste dans la conception d'interfaces modernes & intuitifs."
+            },
+            "scraping": {
+                "title": "Scraping",
+                "content": "Extraction de données web avec Scrapy & Selenium, analyse et transformation avec pandas. Missions de génération de leads B2B et de liste de produits réalisées."
+            }
+        },
+        "contact": {
+            "first-contact": "Premier contact",
+            "quote": "Vous avez un projet en tête ?",
+            "know-more": "En savoir plus sur mon profil",
+            "resume": "Voir mon CV",
+            "freelancing": "Voir mon profil Malt"
+        }
+    },
+    "Blog": {
+        "title": "Blog",
+        "meta": {
+            "title": "Blog",
+            "description": "Ivan Stepanian : Retrouvez ici mes derniers articles sur le développement web et l'ingénierie de données."
+        }
+    },
+    "Links": {
+        "name": "Ivan Stepanian",
+        "social": "Réseaux",
+        "contact": "Contact",
+        "address": "Addresse",
+        "get-a-quote": "Demander un devis",
+        "legal": "Informations légales",
+        "company": "Ivan Stepanian E.I.",
+        "company-number": "SIRET 98505510200018",
+        "company-register": "RCS Créteil",
+        "company-street": "22 avenue Laplace",
+        "company-city": "94110 Arcueil, France",
+        "company-vat": "TVA : FR81985055102",
+        "creator": "Designé et développé en public par Ivan Stepanian",
+        "license": "Code disponible sous licence GPL-3.0 sur <repository>GitHub</repository>",
+        "repository": "https://github.com/iv-stpn/ivanstepanian",
+        "linkedin": "https://www.linkedin.com/in/iv-stpn/",
+        "github": "https://github.com/iv-stpn",
+        "malt": "https://www.malt.fr/profile/ivanstepanian",
+        "telephone": "+33 6 95 69 25 99",
+        "tel": "tel:+33695692599",
+        "email": "iv.stpn@gmail.com",
+        "mailto": "mailto:iv.stpn@gmail.com?body=Bonjour%20Ivan%2C%0A%0AJe%20vous%20contacte%20pour%20%5Bcollaborer%20sur%20un%20projet%5D%0A%0ACordialement%2C%0A%0A%5BVotre%20Nom%5D%0A%0AEnvoy%C3%A9%20depuis%20ivanstepanian.com"
+    },
+    "ContactMeta": {
+        "title": "Contact",
+        "description": "Contactez Ivan Stepanian pour discuter de votre projet de développement web ou d'ingénierie de données. Demandez un devis ou prenez rendez-vous pour une consultation."
+    },
+    "Contact": {
+        "title": "Commençons un projet",
+        "name": "Nom",
+        "name-placeholder": "Jean Dupont",
+        "email": "Email à recontacter",
+        "email-placeholder": "jean.dupont@entreprise.fr",
+        "message": "Message",
+        "message-placeholder": "Comment puis-je vous aider ?",
+        "services": "Services",
+        "survey": "Canal de découverte",
+        "submit": "Envoyer votre message pour être recontacté",
+        "serviceTags": {
+            "etl": "Pipelines ETL",
+            "data": "Analyse de données (R/Python)",
+            "scraping": "Scraping de données (Selenium/Scrapy)",
+            "mobile": "Dév. Mobile (Expo/React Native)",
+            "frontend": "Dév. Frontend (NextJS/React)",
+            "backend": "Dév. Backend (NodeJS/NestJS)",
+            "leads": "Génération de leads B2B",
+            "consulting": "Consulting IT",
+            "other": "Autre"
+        },
+        "surveyTags": {
+            "webSearch": "Recherche web",
+            "meet": "Rencontre en salon, conférence...",
+            "linkedin": "LinkedIn",
+            "socialMedia": "Autre réseau social",
+            "wordOfMouth": "Bouche à oreille",
+            "otherMeans": "Autre"
+        },
+        "success": "Bien reçu, {name} !<br></br>Je vous recontacterai dès que possible.",
+        "additional": "Une précision supplémentaire à ajouter ?",
+        "send-email": "Envoyez un mail à iv.stpn@gmail.com"
+    }
+}

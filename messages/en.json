@@ -1,0 +1,142 @@
+{
+    "Metadata": {
+        "template": "%s :: Ivan Stepanian",
+        "default": "Portfolio :: Ivan Stepanian",
+        "title": "Ivan Stepanian :: Freelance Full-Stack Data Engineer",
+        "locale": "en_US",
+        "description": "I'm Ivan Stepanian, freelance full-stack data engineer based in Paris, France. Passionate about problem-solving and product engineering, I help companies with big data, web development, and data scraping."
+    },
+    "Header": {
+        "name": "Ivan Stepanian",
+        "nickname": "iv-stpn",
+        "tabs": {
+            "about-me": "About me",
+            "resume": "Resume",
+            "blog": "Blog",
+            "contact": "Contact"
+        }
+    },
+    "DarkModeToggle": {
+        "label": "Dark Mode"
+    },
+    "Index": {
+        "titles": {
+            "home": "Full-stack data engineer<br></br>& freelance developer",
+            "articles": "Latest articles",
+            "services": "I can help you with...",
+            "contact": "Get in touch"
+        },
+        "subtitle": "Passionate about problem-solving, business needs analysis, and product engineering, I am seeking new challenges.",
+        "details": "Versatile and rigorous, my skills range from data engineering (<pandas>Pandas</pandas>, <scala>Scala</scala>, <spark>Spark</spark>, <azure>Azure MLOps</azure>...) to full-stack web development (<react>React</react>, <nextjs>Next14</nextjs>, <nestjs>NestJS</nestjs>, <kubernetes>Kubernetes</kubernetes>...), giving me a 360° view of modern digital products.",
+        "work-together": "Let's work together!",
+        "links": {
+            "pandas": "https://pandas.pydata.org",
+            "scala": "https://www.scala-lang.org",
+            "spark": "https://spark.apache.org",
+            "azure": "https://learn.microsoft.com/en-us/azure/machine-learning/concept-model-management-and-deployment",
+            "react": "https://react.dev",
+            "nextjs": "https://nextjs.org/docs/app/building-your-application/routing",
+            "nestjs": "https://nestjs.com",
+            "kubernetes": "https://kubernetes.io"
+        },
+        "freelancing": {
+            "rating": "5.0",
+            "platform": "on Malt",
+            "tags": {
+                "experience": "3+ years of experience",
+                "projects": "10+ projects"
+            }
+        },
+        "services": {
+            "data": {
+                "title": "Big Data",
+                "content": "As a Big Data & Machine Learning engineer by training, I manage ETL pipelines with the Apache stack. I use Plotly and R for data visualization, and TF/Keras for ML."
+            },
+            "web": {
+                "title": "Web Development",
+                "content": "Full-Stack with Expo/React Native & NestJS, Next.js 14 (app directory with API Routes). Sensitive to UX/UI, I assist in designing modern & intuitive interfaces."
+            },
+            "scraping": {
+                "title": "Scraping",
+                "content": "Web data extraction with Scrapy & Selenium, analysis and transformation with pandas. Completed projects include B2B lead & product lists generation."
+            }
+        },
+        "contact": {
+            "first-contact": "First contact",
+            "quote": "A project in mind?",
+            "know-more": "Learn more about my experience",
+            "resume": "My resume",
+            "freelancing": "My freelance profile"
+        }
+    },
+    "Blog": {
+        "title": "Blog",
+        "meta": {
+            "title": "Blog",
+            "description": "Ivan Stepanian: Stay up to date with my latest articles on data engineering & web development."
+        },
+        "subtitle": "Latest articles"
+    },
+    "Links": {
+        "name": "Ivan Stepanian",
+        "social": "Social",
+        "contact": "Contact",
+        "address": "Address",
+        "get-a-quote": "Get a quote",
+        "legal": "Legal",
+        "company": "Ivan Stepanian E.I.",
+        "company-number": "SIRET 98505510200018",
+        "company-register": "RCS Créteil",
+        "company-street": "22 avenue Laplace",
+        "company-city": "94110 Arcueil, France",
+        "company-vat": "VAT: FR81985055102",
+        "creator": "Designed and developed in public by Ivan Stepanian",
+        "license": "Code available under GPL-3.0 license on <repository>GitHub</repository>",
+        "repository": "https://github.com/iv-stpn/ivanstepanian",
+        "linkedin": "https://www.linkedin.com/in/iv-stpn/",
+        "github": "https://github.com/iv-stpn",
+        "malt": "https://www.malt.com/profile/ivanstepanian",
+        "telephone": "+33 6 95 69 25 99",
+        "tel": "tel:+33695692599",
+        "email": "iv.stpn@gmail.com",
+        "mailto": "mailto:iv.stpn@gmail.com?body=Hello%20Ivan%2C%0A%0AI%20am%20contacting%20you%20to%20%5Bcollaborate%20on%20a%20project%5D%0A%0ARegards%2C%0A%0A%5BYour%20Name%5D%0A%0ASent%20from%20ivanstepanian.com"
+    },
+    "ContactMeta": {
+        "title": "Contact",
+        "description": "Get in touch with me to start a project or ask for a quote."
+    },
+    "Contact": {
+        "title": "Let's start a project",
+        "name": "Name",
+        "name-placeholder": "Your name",
+        "email": "Email",
+        "email-placeholder": "your.email@company.com",
+        "message": "Message",
+        "message-placeholder": "What can I help you with?",
+        "services": "Services",
+        "survey": "How did you hear about me?",
+        "submit": "Send it to be contacted",
+        "serviceTags": {
+            "etl": "ETL Pipelines",
+            "data": "Data Analysis (R/Python)",
+            "scraping": "Data Scraping (Selenium/Scrapy)",
+            "mobile": "Mobile Development (Expo/React Native)",
+            "frontend": "Frontend Development (NextJS/React)",
+            "backend": "Backend Development (NodeJS/NestJS)",
+            "leads": "B2B Lead Generation",
+            "consulting": "IT Consulting",
+            "other": "Other"
+        },
+        "surveyTags": {
+            "webSearch": "Web search",
+            "meet": "Meeting at a trade show, conference...",
+            "linkedin": "LinkedIn",
+            "socialMedia": "Other social media",
+            "wordOfMouth": "Word of mouth",
+            "otherMeans": "Other"
+        },
+        "success": "Got it {name}!<br></br>I will get back to you as soon as possible.",
+        "additional": "Any additional information?",
+        "send-email": "Send an email to iv.stpn@gmail.com"
+    }
+}

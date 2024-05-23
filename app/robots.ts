@@ -1,12 +1,5 @@
-import { baseUrl } from 'app/sitemap'
+import { baseUrl } from "./utils/constants";
 
 export default function robots() {
-  return {
-    rules: [
-      {
-        userAgent: '*',
-      },
-    ],
-    sitemap: `${baseUrl}/sitemap.xml`,
-  }
+    return { rules: [{ userAgent: "*" }], sitemap: `${baseUrl}/sitemap.xml` };
 }
