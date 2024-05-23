@@ -3,10 +3,10 @@ import { CustomMDX } from "app/components/MDX";
 import { baseUrl } from "app/utils/constants";
 import { notFound } from "next/navigation";
 
-export async function generateStaticParams() {
-    const posts = getBlogPosts();
-    return posts.map((post) => ({ slug: post.slug }));
-}
+// export async function generateStaticParams() {
+//     const posts = getBlogPosts();
+//     return posts.map((post) => ({ slug: post.slug }));
+// }
 
 type BlogProps = { params: { slug: string; locale: string } };
 export function generateMetadata({ params }: BlogProps) {
