@@ -5,6 +5,7 @@ import ExternalLink from "app/components/common/ExternalLink";
 import Tag from "app/components/common/Tag";
 import TitleList from "app/components/list/TitleList";
 import clsx from "clsx";
+import { useLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import Image from "next/image";
 import MaltLogo from "../../public/logos/brand/malt.svg";
@@ -34,6 +35,7 @@ function LinkBlock({ href, label, external, className }: Readonly<LinkBlockProps
 
 const br = () => <br />;
 export default async function IndexPage() {
+    const locale = useLocale();
     const posts = getBlogPosts();
     const tLinks = await getTranslations("Links");
     const tIndex = await getTranslations("Index");
@@ -179,7 +181,7 @@ export default async function IndexPage() {
                     </div>
                     <div className="md:basis-[50%] mt-12">
                         <div>{tIndex("contact.quote")}</div>
-                        <LinkBlock href="/contact" label={tLinks("get-a-quote")} />
+                        <LinkBlock href={`/${locale}/contact`} label={tLinks("get-a-quote")} />
                     </div>
                 </div>
                 <div className="w-full text-3xl mt-16">
