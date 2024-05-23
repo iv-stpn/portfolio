@@ -11,6 +11,13 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2
+            - uses: pnpm/action-setup@v4
+              with:
+                  version: 8
+                  run_install: |
+                      - recursive: true
+                        args: [--frozen-lockfile, --strict-peer-dependencies]
+                      - args: [--global, gulp, prettier, typescript]
             - name: Install Vercel CLI
               run: npm install --global vercel@canary
             - name: Pull Vercel Environment Information
