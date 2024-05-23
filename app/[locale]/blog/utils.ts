@@ -75,8 +75,7 @@ export function dateSort(date1: string | Date, date2: string | Date) {
     return new Date(date2).getTime() - new Date(date1).getTime();
 }
 
-export function formatDate(locale: Intl.LocalesArgument, date: string, includeRelative = false) {
-    console.log(locale, date, includeRelative);
+export function formatDate(locale: string, date: string, includeRelative = false) {
     const targetDate = new Date(date);
     const fullDate = targetDate.toLocaleString(locale, { month: "long", day: "numeric", year: "numeric" });
 

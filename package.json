@@ -4,7 +4,8 @@
         "dev": "next dev",
         "build": "next build",
         "start": "next start",
-        "migrate": "prisma migrate dev"
+        "migrate": "prisma migrate dev",
+        "tsc": "tsc --noEmit --pretty"
     },
     "dependencies": {
         "@prisma/client": "5.14.0",

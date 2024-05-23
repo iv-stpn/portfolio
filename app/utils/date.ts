@@ -1,11 +1,7 @@
 export const cutoffs = [60, 3600, 86_400, 86_400 * 7, 86_400 * 30, 86_400 * 365, Number.POSITIVE_INFINITY];
 export const units: Intl.RelativeTimeFormatUnit[] = ["second", "minute", "hour", "day", "week", "month", "year"];
 
-export function formatRelativeTime(
-    locale: Intl.LocalesArgument,
-    date: Date | number,
-    style: "short" | "long" = "short"
-) {
+export function formatRelativeTime(locale: string, date: Date | number, style: "short" | "long" = "short") {
     const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto", style });
 
     const timeMs = typeof date === "number" ? date : date.getTime();
