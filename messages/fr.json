@@ -114,7 +114,7 @@
         "message-placeholder": "Comment puis-je vous aider ?",
         "services": "Services",
         "survey": "Canal de découverte",
-        "submit": "Envoyer votre message pour être recontacté",
+        "submit": "Envoyer votre message",
         "serviceTags": {
             "etl": "Pipelines ETL",
             "data": "Analyse de données (R/Python)",
