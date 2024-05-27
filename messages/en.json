@@ -90,7 +90,7 @@
         "company-street": "22 avenue Laplace",
         "company-city": "94110 Arcueil, France",
         "company-vat": "VAT: FR81985055102",
-        "creator": "Designed and developed in public by Ivan Stepanian",
+        "creator": "Built in public by Ivan Stepanian",
         "license": "Code available under MIT license on <repository>GitHub</repository>",
         "repository": "https://github.com/iv-stpn/portfolio",
         "linkedin": "https://www.linkedin.com/in/iv-stpn/",
@@ -115,7 +115,7 @@
         "message-placeholder": "What can I help you with?",
         "services": "Services",
         "survey": "How did you hear about me?",
-        "submit": "Send it to be contacted",
+        "submit": "Send your message",
         "serviceTags": {
             "etl": "ETL Pipelines",
             "data": "Data Analysis (R/Python)",
