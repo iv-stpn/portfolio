@@ -73,9 +73,15 @@
         "title": "Blog",
         "meta": {
             "title": "Blog",
-            "description": "Ivan Stepanian: Stay up to date with my latest articles on data engineering & web development."
+            "description": "Ivan Stepanian: Stay up to date with my latest articles on web development & data engineering!"
         },
         "subtitle": "Latest articles"
+    },
+    "BlogPage": {
+        "published": "Published",
+        "lastUpdated": "Last Updated",
+        "recentPosts": "Recent articles",
+        "back": "Back to blog"
     },
     "Links": {
         "name": "Ivan Stepanian",

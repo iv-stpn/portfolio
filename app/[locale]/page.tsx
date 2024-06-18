@@ -118,7 +118,7 @@ export default async function IndexPage() {
                         <div className="relative flex shrink-0 gap-4">
                             <Image
                                 src="/img/iv-stpn.png"
-                                alt="Photo de profil"
+                                alt="Ivan Stepanian: Photo"
                                 width={200}
                                 height={200}
                                 className="brightness-125 z-10 shrink-0 rounded-full w-28 h-28 xss:w-36 xss:h-36 ssm:rounded-2xl md:pl-0.5 lg:w-44 lg:h-44"
@@ -172,9 +172,9 @@ export default async function IndexPage() {
                     />
                 </div>
             </section>
-            <section className="pad-screen mt-20 pb-16 contained">
+            <section className="pad-screen mt-20 pb-16 contained text-xl md:text-2xl">
                 <h1 className="title mb-6">{tIndex("titles.contact")}</h1>
-                <div className="flex flex-col md:flex-row flex-wrap text-3xl">
+                <div className="flex flex-col md:flex-row flex-wrap">
                     <div className="md:basis-[50%] mt-12">
                         <div>{tIndex("contact.first-contact")}</div>
                         <LinkBlock href={tLinks("mailto")} label={tLinks("email")} />
@@ -184,7 +184,7 @@ export default async function IndexPage() {
                         <LinkBlock href={`/${locale}/contact`} label={tLinks("get-a-quote")} />
                     </div>
                 </div>
-                <div className="w-full text-3xl mt-16">
+                <div className="w-full mt-16">
                     <div>{tIndex("contact.know-more")}</div>
                     <div className="flex flex-col md:flex-row">
                         <LinkBlock

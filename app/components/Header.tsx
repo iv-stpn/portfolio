@@ -42,14 +42,14 @@ export default async function Header() {
         <>
             <nav className="fixed top-0 w-full text-lg md:text-base pt-2 z-30">
                 <div className="flex items-center justify-between pad-screen h-14">
-                    <div className={itemsClass}>
+                    <h4 className={itemsClass}>
                         <Link href={`/${locale}/`} className="flex gap-1.5 items-center">
-                            <span className="font-semibold">{t("name")}</span>
+                            <span className="font-medium">{t("name")}</span>
                             <span className={clsx(firaCode.className, "hidden md:inline text-xs font-medium")}>
                                 &lt;{t("nickname")}/&gt;
                             </span>
                         </Link>
-                    </div>
+                    </h4>
                     <div className={itemsClass}>
                         <DarkModeToggle />
                         <LanguageSwitch />

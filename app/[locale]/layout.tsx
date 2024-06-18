@@ -8,7 +8,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
 import "../global.css";
-import { firaCode, inter } from "./fonts";
+import { figtree, firaCode, inter } from "./fonts";
 
 export type LocaleProps = { params: { locale: string } };
 export async function generateMetadata({ params: { locale } }: LocaleProps) {
@@ -52,7 +52,8 @@ export default async function RootLayout({ children }: Readonly<RootLayoutProps>
             className={clsx(
                 inter.className,
                 firaCode.variable,
-                "font-sans !scroll-smooth text-dark bg-white dark:text-white dark:bg-dark text-[12px] sm:text-[13px] md:text-[14px] mmd:text-[15px] llg:text-[16px] xl:text-[18px] transition-[color,background-color] duration-[300ms]"
+                figtree.variable,
+                "font-sans !scroll-smooth text-dark bg-white dark:text-white dark:bg-dark text-[12px] sm:text-[13px] md:text-[14px] mmd:text-[15px] llg:text-[15px] xl:text-[18px] transition-[color,background-color] duration-[300ms]"
             )}
         >
             <body className="antialiased tracking-tight">

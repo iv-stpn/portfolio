@@ -21,6 +21,13 @@ export default {
                 primary: "#ffdd00",
                 dark: "#1c1d1f",
             },
+            typography: {
+                DEFAULT: {
+                    css: {
+                        maxWidth: "100ch", // add required value here
+                    },
+                },
+            },
         },
     },
     plugins: [require("@tailwindcss/typography")],

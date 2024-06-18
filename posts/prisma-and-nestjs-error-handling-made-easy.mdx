@@ -1,0 +1,255 @@
+---
+title: "Prisma + NestJS: Error Handling Made Easy"
+publishedAt: "2024-05-24"
+summary: "Learn how to cleanly handle native Prisma errors in NestJS applications."
+image: /img/posts/prisma-and-nestjs-error-handling/cover.png
+---
+
+If you're building a NestJS application with Prisma, you might have run into issues when dealing with database errors. For example, for the following User schema:
+
+`schema.prisma`:
+
+```prisma
+model User {
+    id    Int    @id @default(autoincrement())
+    email String @unique
+}
+```
+
+`users.service.ts`:
+
+```typescript
+import { Injectable } from "@nestjs/common";
+import { PrismaService } from "./prisma.service";
+
+import type { UserCreateInput } from "@prisma/client";
+
+@Injectable()
+export class UserService {
+    constructor(private prisma: PrismaService) {}
+
+    async createUser({ email }: UserCreateInput) {
+        return this.prisma.user.create({ data: { email } }); // <-- If a user with the same email already exists, this will throw a PrismaClientKnownRequestError and the default NestJS error handler will return a 500 Internal Server Error
+    }
+}
+```
+
+In the above code, when a user with the same email already exists, Prisma will throw a `PrismaClientKnownRequestError` when you would most likely want to return a 400 Bad Request error instead. To achieve this, you could catch the error and throw a custom exception:
+
+```typescript
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "./prisma.service";
+
+import type { UserCreateInput } from "@prisma/client";
+
+@Injectable()
+export class UserService {
+    constructor(private prisma: PrismaService) {}
+
+    async createUser(data: UserCreateInput) {
+        try {
+            return this.prisma.user.create({ data });
+        } catch (error) {
+            // Identify the Prisma error code corresponding to a missing database record
+            if (error.code === "P2002") throw new NotFoundException("User with the same email already exists");
+            throw error;
+        }
+    }
+}
+```
+
+To find the list of Prisma error codes, you can refer to the [Prisma documentation](https://www.prisma.io/docs/orm/reference/error-reference#error-codes).
+
+This approach works and allows for custom error handling, but it can quickly become repetitive and error-prone could lead to unexpected behavior if you forget to handle a specific error code.
+
+Instead, to make error handling more manageable, you can create a custom NestJS global exception filter.
+
+## Creating a custom NestJS global exception filter
+
+In NestJS, requests are processed by a series of middleware functions that follow the NestJS request/response lifecycle:
+
+![NestJS request/response lifecycle](/img/posts/prisma-and-nestjs-error-handling/lifecycle.png)
+
+After app middlewares are executed, the request is passed to the route handler; any exceptions thrown later in the lifecycle are caught by a special portion of logic called an "exception filter".
+
+NestJS apps can have multiple exception filters that can be scoped on a global, controller, or method level; NestJS also provides a built-in `HttpExceptionFilter` that rethrows NestJS's built-in exceptions as HTTP responses or a 500 Internal Server Error if the exception is not an instance of `HttpException`.
+
+To create your own exception filter, you can implement the `ExceptionFilter`'s `catch` method:
+
+```typescript
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from "@nestjs/common";
+import { MyError } from "./my-error";
+
+@Catch(MyError) // <-- Replace MyError with the error class you want to handle
+export class MyErrorFilter implements ExceptionFilter {
+    catch(exception: MyError, host: ArgumentsHost) {
+        // <-- Implement the catch method
+        const ctx = host.switchToHttp();
+        const response = ctx.getResponse();
+
+        response.status(status).json({
+            // <-- Change the response status and message
+            statusCode: 500,
+            message: "My error occured and I handled it gracefully!",
+        });
+    }
+}
+```
+
+Now that we know how to create a custom exception filter, let's make one that handles Prisma errors:
+
+```typescript
+import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from "@nestjs/common";
+import { PrismaClientKnownRequestError } from "@prisma/client";
+
+const errorMap: Record<string, { status: number; message: string } | undefined> = {
+    // <-- Map Prisma error codes to HTTP status codes and a generic error message
+    P2000: { status: HttpStatus.BAD_REQUEST, message: "Invalid data provided" }, // 400 Bad Request
+    P2002: { status: HttpStatus.CONFLICT, message: "Resource already exists" }, // 409 Conflict
+    P2025: { status: HttpStatus.NOT_FOUND, message: "Resource not found" }, // 404 Not Found
+    // Add any other prisma error codes you want to handle...
+};
+
+@Catch(PrismaClientKnownRequestError)
+export class PrismaErrorFilter implements ExceptionFilter {
+    catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
+        const ctx = host.switchToHttp();
+        const response = ctx.getResponse<Response>();
+
+        const { code } = exception;
+        const { status, message } = errorMap[code] ?? {
+            status: HttpStatus.INTERNAL_SERVER_ERROR,
+            message: "Internal server error",
+        };
+
+        response.status(status).json({ statusCode: status, message });
+    }
+}
+```
+
+You can now use our custom `PrismaErrorFilter` globally by adding it to the `APP_FILTER` provider in the app module:
+
+```typescript
+import { Module } from "@nestjs/common";
+
+import { APP_FILTER } from "@nestjs/core";
+import { PrismaErrorFilter } from "./prisma-error.filter";
+
+@Module({
+    providers: [
+        {
+            provide: APP_FILTER,
+            useClass: PrismaErrorFilter,
+        },
+        // ...other providers
+    ],
+    // ...other module properties
+})
+export class AppModule {
+    // ...app module code
+}
+```
+
+When errors do not match the type we put in the `@Catch` decorator, they will be caught by the built-in `HttpExceptionFilter`. Another centralized approach can be to handle all expected (and unexpected) errors in a single, global exception filter. With this approach, you can easily handle unexpected errors (allowing you for example, to send an alert to Sentry) and log error responses:
+
+**_NB: Using the global exception filter for logging error responses is especially useful as exceptions will not go through interceptors you might have set up for logging (they get caught immediatly and only go through exception filters)_**
+
+```typescript
+import { Response } from "express";
+import { ArgumentsHost, Catch, HttpException, HttpStatus } from "@nestjs/common";
+import { BaseExceptionFilter, HttpServer } from "@nestjs/core";
+import { Prisma } from "@prisma/client";
+import { inspect } from "util";
+import * as Sentry from "@sentry/node"; // <-- Example Sentry integration
+
+import { LoggerService } from "./logger.service";
+
+@Catch() // <-- Catch all exceptions
+export class GlobalExceptionFilter extends BaseExceptionFilter {
+    constructor(
+        private readonly httpAdapter: HttpServer,
+        private readonly logger: LoggerService
+    ) {
+        super(httpAdapter);
+    }
+
+    private getHttpExceptionMessage(exception: HttpException): string {
+        const response = exception.getResponse();
+        // Example handling of custom response objects
+        if (typeof response === "object" && response?.message) {
+            if (typeof response.message === "string") return response.message;
+            if (Array.isArray(response.message) && response.message.every((message) => typeof message === "string"))
+                return response.message.join("\n");
+        }
+        return typeof response === "string" ? response : exception.message;
+    }
+
+    private logAndSendResponse(statusCode: number, message: string, response: Response): void {
+        console.log(`Response/Error - Status: ${statusCode} - Message: ${message}`);
+        response.status(statusCode).json({ statusCode, message });
+    }
+
+    private handleUnexpectedError(error: Error, response: Response): void {
+        const context = error.stack ?? String(error);
+        this.logger.error(inspect(error), context); // <-- Log the error to your logger
+        Sentry.captureException(error); // <-- Send the error to Sentry
+        this.logAndSendResponse(HttpStatus.BAD_REQUEST, "Please contact an administrator", response); // <-- Send a generic error message to the client
+    }
+
+    // Expected error handlers
+    private handlePrismaError(exception: Prisma.PrismaClientKnownRequestError, response: Response): void {
+        const defaultMessage = exception.message.replace(/\n/g, "");
+        const { meta, code } = exception;
+
+        switch (code) {
+            case "P2000":
+                const message = meta?.cause ?? defaultMessage; // <-- You can use the meta field to provide more context about the error
+                this.logAndSendResponse(HttpStatus.BAD_REQUEST, message, response);
+                break;
+            case "P2002":
+                // For example, getting the target schema in the case of a unique constraint violation...
+                const message = meta?.target ? `${meta.target} with same field already exists` : defaultMessage;
+                this.logAndSendResponse(HttpStatus.CONFLICT, message, response);
+                break;
+            case "P2025":
+                // ...or the model name in the case of a missing record
+                const message = meta?.modelName ? `No ${meta.modelName} found` : defaultMessage;
+                this.logAndSendResponse(HttpStatus.NOT_FOUND, message, response);
+                break;
+            default:
+                this.handleUnexpectedError(exception, response);
+                break;
+        }
+    }
+
+    private handleHttpException(exception: HttpException, response: Response): void {
+        const statusCode = exception.getStatus();
+        const message = this.getHttpExceptionMessage(exception);
+        this.logAndSendResponse(statusCode, message, response);
+    }
+
+    catch(exception: unknown, host: ArgumentsHost) {
+        const ctx = host.switchToHttp();
+        const response = ctx.getResponse<Response>();
+
+        if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+            this.handlePrismaError(exception, response);
+        } else if (exception instanceof HttpException) {
+            this.handleHttpException(exception, response);
+            // ...add more custom error handlers here if needed
+        } else if (exception instanceof Error) {
+            // <-- Handle unexpected errors
+            this.handleUnexpectedError(exception, response);
+        } else {
+            // <-- Handle unexpected error types (this should never happen in practice!)
+            this.handleUnexpectedError(new Error(`Unexpected error type, ${inspect(exception)}`), response);
+        }
+    }
+}
+```
+
+This will allow you to have a single, shared logic to handle exceptions throughout your application, and gracefully handle Prisma errors (and any other expected errors you might want to handle!) in a centralized manner.
+
+And that's it! You now have a clean and centralized way to handle Prisma errors in your NestJS application. If you have any questions or feedback, feel free to reach out to me on [Twitter/X](https://twitter.com/ivstpn).
+
+Happy coding! 🚀

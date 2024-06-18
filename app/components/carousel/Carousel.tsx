@@ -18,11 +18,11 @@ export default function Carousel({ slides, className, parentClassName, options }
 
     return (
         <div className={clsx("overflow-hidden", parentClassName)} ref={emblaRef}>
-            <div className={clsx("flex touch-pan-y touch-pinch-zoom -ml-4 md:-ml-6", className)}>
+            <div className={clsx("flex touch-pan-y touch-pinch-zoom -ml-4 xs:-ml-12 md:-ml-6", className)}>
                 {slides.map((inner, index) => (
                     <div
                         className={clsx(
-                            "grow-0 shrink-0 basis-full md:basis-[50%] xl:basis-[33%] pl-4 md:pl-6",
+                            "grow-0 shrink-0 basis-full md:basis-[50%] lg:basis-[33%] pl-4 xs:pl-12 md:pl-6",
                             index === slides.length - 1 && "mr-6"
                         )}
                         key={index}
@@ -37,7 +37,7 @@ export default function Carousel({ slides, className, parentClassName, options }
                         <div
                             key={index}
                             className={clsx(
-                                "w-16 h-1",
+                                "w-16 h-1 rounded-full",
                                 index === selectedIndex
                                     ? "bg-neutral-600 dark:bg-neutral-200"
                                     : "bg-neutral-300 dark:bg-neutral-600"

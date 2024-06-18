@@ -5,6 +5,7 @@ import path from "path";
 export type Metadata = {
     title: string;
     publishedAt: string;
+    lastUpdatedAt?: string;
     summary: string;
     image: string;
 };
@@ -80,5 +81,5 @@ export function formatDate(locale: string, date: string, includeRelative = false
     const fullDate = targetDate.toLocaleString(locale, { month: "long", day: "numeric", year: "numeric" });
 
     if (!includeRelative) return fullDate;
-    return `${fullDate} (${formatRelativeTime(locale, targetDate, "long")})`;
+    return `${fullDate} (${formatRelativeTime(locale, targetDate, "short")})`;
 }

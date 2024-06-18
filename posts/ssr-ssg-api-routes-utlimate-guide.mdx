@@ -1,0 +1,399 @@
+---
+title: "SSR, SSG, ISR and API routes in Next.js — The Ultimate Guide"
+publishedAt: "2024-06-17"
+summary: "Learn how to use server-side rendering, static site generation, and API routes in Next.js 14 to build fast and scalable web applications."
+image: /img/posts/ssr-ssg-api-routes-ultimate-guide/cover.png
+---
+
+If you've used modern frontend frameworks, you've definitely come across plenty of acronyms like CSR, RSC, SSR, SSG, ISR and API routes. In this article, we'll clarify what all those terms mean, and focus on how they are used in Next.js 14 app directory (though the concepts are applicable to other frameworks such as Nuxt).
+
+## Client-side rendering (CSR) vs. server-side rendering (SSR)
+
+Back in the day, the main way to build web applications was to render HTML on the server and send it to the client via PHP or Python/Django for example; this approach is a type of server-side rendering (SSR).
+
+Later on, single-page applications (SPAs) emerged, where the server would serve a single HTML file and a JavaScript bundle that would populate the external content of pages by making AJAX requests to APIs.
+
+This later approach is known as client-side rendering (CSR), being the main rendering strategy used by SPAs. The core advantage of CSR is seemless navigation between pages, as the page doesn't need to be reloaded when the user navigates to a different route (hence the name "single-page application"). It also reduces the load on the server by putting the rendering work on the client.
+
+But CSR has its downsides:
+
+1. **Poor search engine optimization (SEO)**: When search engines crawl a SPA site, they most often see an empty page initially, as the content is rendered by JavaScript _after_ the page is loaded. This often results in poor SEO performance.
+2. **Increased bundle size and load time**: The initial load of a CSR application needs to download a large JavaScript bundle (usually containing the entire application), which increases the load time and can be a problem for users on slow connections for SPAs.
+3. **Poor performance**: CSR applications put all the frontend processing load on the client, which can be a problem for low-end devices when large conditional lists or complex components are rendered.
+
+As time went on, developers started to look for ways to combine the best of both worlds: the speed and interactivity of SPAs with the SEO and performance benefits of server-side rendering (SSR).
+
+## Hybrid rendering: initial SSR and hydration
+
+An early approach to combining SSR and CSR was to render the initial page on the server (returning HTML/CSS to the client) and then addind JavaScript interactivity in 2 steps:
+
+1. Download the framework bundle and the application code.
+2. Add event listeners and JavaScript interactivity to the static HTML content that was rendered on the server.
+
+This approach is known as **hydration**. The HTML/CSS content is loaded first, giving the user a fast initial load time, and then the JavaScript bundle is downloaded asynchronously in step 1, before "hydration" (the process of adding interactivity and framework logic to the static content) is performed in step 2.
+
+Since the code on the server also uses the same framework as the client to create the initial HTML, "hydration" is sometimes referred to as "rehydration", because the framework JavaScript logic runs twice (once on the server and once on the client after the JavaScript bundle has been downloaded).
+
+This hydration process only needs to happen on the initial load; afterwards, the application behaves like a normal SPA application. But if we want to improve performance and reduce the load on the client in subsequent navigations, we can leverage server components, called in React "RSCs" (React Server Components).
+
+## React Server Components (RSCs) in Next.js
+
+Instead of using SSR only for the initial page load, why not use it for every compute-heavy component or page in the application? This is the idea behind React Server Components (RSCs).
+
+As an example, let's see how those are implemented in Next.js:
+
+```javascript
+async function getServerData() {
+    // Fetch data from the server
+    return { data: "Hello from the server!" };
+}
+
+async function MyServerComponent() {
+    // This component is marked "async", meaning it will be rendered on the server
+    const { data } = await getServerData(); // <-- this will be executed on the server, and can query API, databases safely (secrets are not exposed to the client) and CORS is not an issue
+    return <div>{data}</div>;
+}
+
+function MyClientComponent() {
+    // By default, components that aren't marked "async" are "shared" components: they are rendered on the server or the client depending on whether the page is being rendered on the server or the client
+    return <div>Client-side rendered component</div>;
+}
+
+export default async function Home() {
+    // This component is rendered on the server and can include server and client components
+    return (
+        <div>
+            <MyServerComponent />
+            <MyClientComponent />
+        </div>
+    );
+}
+```
+
+Under the hood, Next.js will create server endpoints for each server component. This allows the server to encapsulate backend logic that can include secrets and database queries without exposing them to the client.
+
+However, RSCs faces the limitations of a pre-hydrated application: they cannot use browser JavaScript and thus cannot use the Window/Browser APIs, client hooks or event listeners. This can be mediated by using inner client components to add interactivity.
+
+As example, we can create a server-rendered card with a client rendered like button:
+
+`like-button.js`:
+
+```javascript
+"use client"; // By marking the file as "use client", we don't make it a "shared" component, but a client-only component - it can use browser JavaScript
+function LikeButton({ postId }) {
+    const fetcher = () =>
+        fetch(`http://api.example.com/posts/${postId}/like`, { method: "POST" })
+            .then(() => console.log(`Post ${postId} was successfully liked!`))
+            .catch(() => console.error(`Error: Could not like Post ${postId}!`));
+
+    // onClick is an event listener and can only be used in a client component!
+    return <button onClick={fetcher}>Like!</button>;
+}
+```
+
+`post-list.js`:
+
+```javascript
+import LikeButton from "./like-button";
+
+async function getPosts() {
+    // Fetch data from the server
+    return [
+        { id: 1, content: "Great news! RSCs are now generally available" },
+        { id: 2, content: "You can even render client components inside server components to add interactivity!" },
+    ];
+}
+
+// This component is marked "async", meaning it will be rendered on the server
+async function PostComponent({ post }) {
+    return (
+        <div>
+            {post.content}
+            <LikeButton postId={post.id} />
+        </div>
+    );
+}
+
+// This component is marked "async", meaning it will be rendered on the server
+export default async function PostList() {
+    const posts = await getPosts();
+    return (
+        <div>
+            {getPosts().map((post) => (
+                <PostComponent post={post} />
+            ))}
+        </div>
+    );
+}
+```
+
+In this example, the `PostList` component is rendered on the server and fetches the posts from the server. The `PostComponent` is also rendered on the server (reducing the load on the client) and includes a client-side rendered `LikeButton` component that adds interactivity to the post.
+
+## An API in the same code base as the frontend?
+
+Introducing: route handlers (or API routes). Added in Next.js 9, API routes allow to create serverless functions that can be used to fetch data from an API, database, or any other source, and return it as JSON, allowing to define a backend alongside your frontend code, using the same principles as server components (except, instead of returning HTML/CSS, they return JSON).
+
+`app/api/posts/route.js`:
+
+```javascript
+import { sql } from "@vercel/postgres";
+
+export async function GET(req) {
+    const posts = await sql`SELECT id, content FROM posts`;
+    return { posts };
+}
+
+export async function POST(req) {
+    const { content } = req.body;
+    const post = await sql`INSERT INTO posts (content) VALUES (${content}) RETURNING id, content`;
+    return { post };
+}
+```
+
+`app/api/posts/[id]/route.js`:
+
+```javascript
+import { sql } from "@vercel/postgres";
+
+export async function GET(req) {
+    const { id } = req.params;
+    const post = await sql`SELECT id, content FROM posts WHERE id = ${id}`;
+    return { post };
+}
+
+export async function PATCH(req) {
+    const { id } = req.params;
+    const { content } = req.body;
+    const post = await sql`UPDATE posts SET content = ${content} WHERE id = ${id} RETURNING id, content`;
+    return { post };
+}
+```
+
+Tada! In this example, we have a simple API that can fetch, create, and update posts directly by connecting to the database. If deployed on Vercel, those endpoints will automatically be served as auto-scaling serverless functions.
+
+Additionally, `sql` provided by `@vercel/postgres` is a tagged template literal that allows to safely interpolate variables into SQL queries, preventing SQL injection attacks.
+
+## What about static site generation (SSG)?
+
+React server components are great for improving performance, but are innefficient for redering content that isn't dynamic (i.e. static content), such as landing pages, FAQs, product pages, as they will be re-rendered on every request, even if the content doesn't change. This is where static site generation (SSG) comes in.
+
+For non-dynamic pages, you can tell Next.js to generate the HTML/CSS content at build time, and serve it as static files, just like a traditional web 1.0 site: this is static site generation (SSG).
+
+By default, Next.js will generate static files for pages that don't make use of server-side data fetching (like fetching data from an API or database).
+
+For example:
+
+```javascript
+export default function Home() {
+    return (
+        <div>
+            <h1>Welcome to my website!</h1>
+            <p>This is a static page generated at build time.</p>
+        </div>
+    );
+}
+```
+
+By default, this page will be generated at build time and served as a static file. To create static pages that can still do server-side data fetching, we can use `getStaticProps` to pass data to the page at build time as props (we can call it "data-dependent SSG").
+
+`app/posts/index.js`:
+
+```javascript
+import { domain } from "../env";
+
+export async function getStaticProps() {
+    const res = await fetch(`${domain}/api/posts`); // This will be executed at build time, and called against our own API routes
+    const posts = await res.json();
+
+    return { props: { posts } };
+}
+
+export default function Home({ posts }) {
+    return (
+        <div>
+            <h1>Welcome to my website!</h1>
+            <p>This is a static page generated at build time.</p>
+            <ul>
+                {posts.map((post) => (
+                    <li key={post.id}>{post.content}</li>
+                ))}
+            </ul>
+        </div>
+    );
+}
+```
+
+The `posts` will only be fetched once at build time, and the page will be served as a static file. We can also generate static pages for dynamic routes using `getStaticPaths`, that will return the list of paths that will should be generated as static pages at build time.
+
+`app/posts/[id].js`:
+
+```javascript
+import { domain } from "../env";
+
+export async function getStaticPaths() {
+    const posts = await fetch(`${domain}/api/posts`); /// This will be executed at build time, and called against our own API routes
+    const paths = posts.map((post) => ({ params: { id: post.id } })); // A path is a list of parameters that will be passed to getStaticProps
+    return { paths };
+}
+
+export async function getStaticProps({ params }) {
+    // paths will be passed one by one to getStaticProps
+    const post = await fetch(`${domain}/api/posts/${params.id}`); // This will be executed at build time, and called against our own API routes
+    return { props: { post } };
+}
+
+export default function Post({ post }) {
+    return (
+        <div>
+            <h1>Post #{post.id}</h1>
+            <p>{post.content}</p>
+        </div>
+    );
+}
+```
+
+This will generate static pages for the posts at build time, and so just like the previous example, the posts will be fetched only once.
+
+However, this may pose a problem: since the server won't have to re-render the page on every request, the data might become "stale" (i.e. posts might have been modified, added or removed) and the page would need to be re-built to reflect the changes. And this is where incremental static regeneration (ISR) comes in.
+
+## Refreshing data-dependent SSG with ISR
+
+Imagine a user update a given post that was previously rendered statically. Next.js allows us to mark the corresponding page as "stale" and re-generate it at runtime, without having to re-build the entire application. To do so, we use incremental static regeneration (ISR) with `revalidatePath` from `next/cache` in our API routes.
+
+`app/posts/[id]/route.js`:
+
+```javascript
+import { sql } from "@vercel/postgres";
+
+// ...
+
+export async function PATCH(req) {
+    const { id } = req.params;
+    const { content } = req.body;
+    const post = await sql`UPDATE posts SET content = ${content} WHERE id = ${id} RETURNING id, content`;
+
+    // Mark the post's page as "stale" and re-generate it at runtime
+    revalidatePath(`/posts/${id}`);
+
+    return { post };
+}
+```
+
+We can also revalidate when adding new posts:
+
+`app/api/posts/route.js`:
+
+```javascript
+import { sql } from "@vercel/postgres";
+
+// ...
+
+export async function POST(req) {
+    const { content } = req.body;
+    const post = await sql`INSERT INTO posts (content) VALUES (${content}) RETURNING id, content`;
+
+    // Though the post id has not yet been included in getStaticPaths, we can mark the new post's page as "stale" and generate it at runtime
+    revalidatePath(`/posts/${post.id}`);
+    revaidatePath("/posts"); // Also revalidate the posts list, with the new post
+
+    return { post };
+}
+```
+
+This way, we can keep the data up-to-date without having to re-build the entire application, and only re-generate the pages that need to be updated.
+
+## A note about the render tree
+
+A special rule about interleaving client and server components is that server components cannot be used inside the JSX of client components, but can be passed via the `children` prop (or any other prop) to client components that are used inside server components.
+
+Shared components can be used in both contexts, as long as they don't use browser JavaScript or event listeners.
+
+As long as you are within the context of a client components, all components beneath it must be client components or shared components.
+
+Here is an illustration of the render tree:
+
+![Next.js Render Tree](/img/posts/ssr-ssg-api-routes-ultimate-guide/render-tree.png)
+
+## A note about caching
+
+As all server components and route handlers are "pure" serverless functions (they only depend on their props & params and don't have side effects) they can be cached when calls are made with the same props & params.
+
+Revalidation (as seen earlier with `validatePath`) is the process of indicating that a new render or new fetch call should be made on the next query of the page and can be customized for every page. There are two ways to do revalidation:
+
+1. On-demand revalidation; revalidation is indicated explicitely in a route handler or server component:
+
+-   `revalidatePath` indicates a given path should be revalidated
+-   `revalidateTag` indicates that all fetchs with a given tag should be revalidated (tags can be added to `fetch` via an extra optons parameter polyfilled by Next.js)
+
+```javascript
+fetch("http://api.example.com/posts", { tag: "posts" });
+```
+
+2. Time-based revalidation; revalidation is indicated by a time interval:
+
+-   By adding a top level `revalidate` property to a server route, we can indicate that the page should be revalidated every `n` seconds:
+
+```javascript
+const revalidate = 60; // Revalidate every 60 seconds
+
+export default function Home() {
+    return (
+        <div>
+            <h1>Welcome to my website!</h1>
+            <p>This is a static page generated at build time.</p>
+        </div>
+    );
+}
+```
+
+-   By adding a `revalidate` option to a `fetch` call in the custom next properties:
+
+```javascript
+export async function getStaticProps() {
+    const res = await fetch(`${domain}/api/posts`, { next: { revalidation: 60 } }); // Revalidate every 60 seconds
+    const posts = await res.json();
+
+    return { props: { posts } };
+}
+```
+
+Outside of revalidation, Next.js has built-in caching mecahnisms at every step to improve performance & avoid redundant re-renders:
+
+1. The client router cache: when navigating between pages, the client router will cache the pages that have already been rendered, and will only re-render if revalidation has been triggered or if the page has been purged from the cache.
+2. The full route cache: the SSR cache storing entire rendered pages for a given path, only rerendered if revalidation has been triggered.
+3. Request memoization: avoids redundant fetch or page rendering calls by memoizing the results of fetch and page server component calls inside the same render tree.
+4. Data cache: the cache for fetch calls that are made throughout the app. Can be revalidated via tags or time-based revalidation.
+
+![Next.js Caching](/img/posts/ssr-ssg-api-routes-ultimate-guide/caching.webp)
+
+## Summary of concepts
+
+In conclusion here is a definition of all the acronyms and terms we've encountered & other linked terms:
+
+`SPA`: single-page application, a webapp that bundles the frontend logic and sends it to the client, requesting data on-the-fly via AJAX (fetch, axios...).
+
+-   `CSR`: client-side rendering, meaning components are bundled on the server and rendered on the client, allowing them to be interactive and access APIs that are only available on the browser. Any component that uses inline JavaScript or event handlers must be client-rendered. An non-async component can be marked as CSR (or client component) by using the `"use client"` directive on top of the component definition file.
+
+-   `SSR`: server-side rendering, meaning components/pages are bundled AND rendered on the server, then returned to the frontend as a payload that can be interpreted as HTML/CSS without needing to be rerendered.
+
+-   `Shared component`: a component that can be SSR or CSR depending on the render tree. As such, shared components should never use browser JavaScript nor backend logic (they are used purely for presentation and props based logic).
+
+-   `RSC`: While React Server Components were initially started by Next.js, a new server components standard is natively included in React 19, allowing for server rendering of asynchronous components that can include backend logic and secrets. In the new pattern, `Promises` that access backend logic can even be passed from server components to client components and triggered later with the `use` hook, allowing for a seamless integration of server and client components. More information can be found [here](https://react.dev/reference/rsc/server-components).
+
+-   `API route/route handler`: a route in Next.js, in the same codebase as frontend code, that exports `GET`, `POST`, `PATCH` and/or `DELETE` functions that will be treated as endpoints by the server and are functionally serverless functions that can return custom `Response` payloads. They can replace traditional backend logic and can be used to fetch data from APIs/databases.
+
+-   `SSG`: static site generation, a method of generating static pages at build time that can be served as static files, reducing the load on the server and improving performance. Pages that don't depend on per-request data (i.e. cookies, headers, non-route params) can be generated as static pages. Routes that include route params (like `posts/[id]`) can be generated as static pages using `getStaticPaths`.
+
+-   `ISR`: incremental static regeneration, a method of refreshing SSG pages at runtime without having to re-build the entire application. Pages can be marked as "stale" and re-generated at runtime to reflect data changes, allowing for up-to-date data without having to re-build the entire application.
+
+-   `Revalidation`: the process of indicating that a page should be re-generated at runtime. Revalidation can be done on-demand (with `revalidatePath` and `revalidateTag`) or time-based (with the top-level `revalidate` property in server components or the `revalidate` option in fetch calls).
+
+-   `Cache`: Next.js has built-in caching mechanisms at every step to improve performance and avoid redundant re-renders. The client router cache, the full route cache, request memoization, and data cache are all used to improve performance and avoid redundant re-renders.
+
+-   `Render tree`: Server components can only be used in the server part of the render tree, while client components can be used in both the server and client parts of the render tree (but any component below a client component must be a client component or a shared component).
+
+That concludes our ultimate guide to SSR, SSG, and API routes in Next.js 14. Hopefully, you made it to the end and learned something new about how to build fast and scalable web applications with Next.js!
+
+If you have any questions or feedback, feel free to reach out to me on [Twitter/X](https://twitter.com/ivstpn).
+
+Happy coding! 🚀

@@ -30,13 +30,17 @@ export function Tab({ icon, iconFilled, label, link, external }: Readonly<TabPro
         isActive && "bg-primary dark:!text-primary dark:bg-transparent rounded-2xl"
     );
 
-    return external ? (
-        <a href={link} className={className} target="_blank" rel="noopener noreferrer">
-            {inner}
-        </a>
-    ) : (
-        <Link href={link} className={className}>
-            {inner}
-        </Link>
+    return (
+        <h4>
+            {external ? (
+                <a href={link} className={className} target="_blank" rel="noopener noreferrer">
+                    {inner}
+                </a>
+            ) : (
+                <Link href={link} className={className}>
+                    {inner}
+                </Link>
+            )}
+        </h4>
     );
 }

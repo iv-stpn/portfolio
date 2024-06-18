@@ -1,0 +1,200 @@
+---
+title: "Custom DTO validators in NestJS using class-validator"
+publishedAt: "2024-05-22"
+summary: "Learn how DTO validation works & how to create custom validators in NestJS with class-validator."
+image: /img/posts/nestjs-custom-validator/cover.png
+---
+
+DTOs (data transfer objects) are an ubiquitous pattern in NestJS to validate incoming data. They are used to describe the shape of the data that is expected in a request, and validate that data as it is processed by the controller.
+
+When validating DTOs in NestJS, the need for custom DTO validation might arise. In this article, as an example, we will learn how to create a "MinimumAge" validator that checks if a given date corresponds to the birthdate of a person who is at least a certain age.
+
+## About decorators and class-validator
+
+In TypeScript, decorators add custom behavior to classes, methods (e.g. executing a function before or after the method), and class properties (e.g. setting a default value for the property).
+
+Decorators can also add custom metadata ("hidden" properties) to classes and instances that can be accessed at runtime. This is useful for libraries like <code>class-validator</code> that use decorators to define validation rules, that can later on be retrieved to validate class instances.
+
+<code>class-validator</code> provides decorators and functions to validate class instances. Those decorators are used to
+define validation rules on class properties, and the `validate` function can then be used to validate the class instance:
+
+```typescript
+import { validate, Length, IsDate } from "class-validator";
+
+export class User {
+    @IsDate() // createdAt must be a valid date
+    createdAt: Date;
+
+    @Length(2, 30) // name must be between 2 and 30 characters
+    name: string;
+}
+
+const user = new User();
+user.createdAt = new Date(); // <-- Valid date
+user.name = "This naaaaaaaaame is way too longggggggggggg!"; // <-- Invalid name (more than 30 characters)
+
+validate(user).then((errors) => console.log(errors));
+// Will output
+// [
+//   ValidationError {
+//     target: User {
+//       name: 'This naaaaaaaaame is way too longggggggggggg!',
+//       createdAt: <currentDate>
+//     },
+//     value: 'This naaaaaaaaame is way too longggggggggggg!',
+//     property: 'name',
+//     children: [],
+//     constraints: { isLength: 'name must be shorter than or equal to 30 characters' }
+//   }
+// ]
+```
+
+NestJS uses <code>class-validator</code> under the hood to validate DTOs. When a request is received, the framework runs the `validate` function on the DTO instance, and if any validation errors are found, it returns a `400 Bad Request` response with the error details provided by <code>class-validator</code>.
+
+`create-user.dto.ts`:
+
+```typescript
+import { IsString, IsDate, Length } from "class-validator";
+
+export class CreateUserDto {
+    @IsDate()
+    createdAt: Date;
+
+    @IsString()
+    @Length(20, 100)
+    name: string;
+}
+```
+
+```typescript
+import { Controller, User, Body } from "@nestjs/common";
+import { CreateUserDto } from "./create-user.dto";
+// ↑ NOTE: the DTO should not be imported as a type but as a class, as runtime metadata is needed (types are removed at runtime, but classes and their metadata are not)
+
+@Controller("users")
+export class UsersController {
+    @User()
+    createUser(@Body() createUserDto: CreateUserDto) {
+        // DTO validation will happen automatically!
+        return createUserDto;
+    }
+}
+```
+
+```typescript
+// Example frontend request
+
+const dateNow = new Date();
+const response = await fetch("http://localhost:3000/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        createdAt: dateNow.toISOString(),
+        name: "Too short!",
+    }),
+});
+
+console.log(await response.json());
+// Will output
+// { statusCode: 400, message: 'Bad Request', error: 'Bad Request', message: ['name must be shorter than or equal to 30 characters'] }
+```
+
+## Creating a custom validator
+
+To create a custom validator, we need to create a class marked `ValidatorConstraint` that implements the `validate` method of `ValidatorConstraintInterface`.
+
+The `validate` method expects the value to be validated and a `ValidationArguments` object that contains the arguments that were passed to the decorator.
+
+It should return `true` if the value is valid, and `false` otherwise.
+
+```typescript
+import { ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments } from "class-validator";
+
+@ValidatorConstraint()
+export class MinimumAgeConstraint implements ValidatorConstraintInterface {
+    validate(date: Date, args: ValidationArguments) {
+        // <-- args contains the decorator arguments
+        const [age] = args.constraints;
+        if (typeof age !== "number") throw new Error("Age must be a number."); // <-- Validate the arguments
+
+        const dateAge = new Date(date).getTime() - Date.now();
+        return new Date(dateAge).getFullYear() >= age; // <-- Return the validation result (true if valid, false otherwise)
+    }
+
+    defaultMessage(args: ValidationArguments) {
+        const [age] = args.constraints;
+        return `Age must be at least ${age} years old.`; // <-- Return the error message
+    }
+}
+
+export function MinimumAge(property: number, validationOptions?: ValidationOptions) {
+    // The actual decorator that will be used on the DTO
+    return function (object: Object, propertyName: string) {
+        // <-- Decorator factory pattern
+        registerDecorator({
+            target: object.constructor,
+            propertyName: propertyName,
+            constraints: [property], // <-- ValidationConstraint expects constraints to be the values that will be used for validation in the validate method
+            options: validationOptions,
+            validator: MinimumAgeConstraint,
+        });
+    };
+}
+```
+
+Now we can use the `MinimumAge` decorator on the DTO:
+
+```typescript
+import { IsDate, IsString, Length } from "class-validator";
+import { MinimumAge } from "./minimum-age.validator";
+
+export class CreateUserDto {
+    @IsDate()
+    createdAt: Date;
+
+    @IsString()
+    @Length(20, 100)
+    name: string;
+
+    @MinimumAge(18) // <-- Use the custom validator
+    birthdate: Date;
+}
+```
+
+```typescript
+import { Controller, User, Body } from "@nestjs/common";
+import { CreateUserDto } from "./create-user.dto";
+
+@Controller("users")
+export class UsersController {
+    @User()
+    createUser(@Body() createUserDto: CreateUserDto) {
+        return createUserDto;
+    }
+}
+```
+
+```typescript
+// Example frontend request
+
+const dateNow = new Date();
+const response = await fetch("http://localhost:3000/users", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        createdAt: dateNow.toISOString(),
+        name: "George",
+        birthdate: new Date("2010-05-20").toISOString(),
+    }),
+});
+
+console.log(await response.json());
+// Will output
+// { statusCode: 400, message: 'Bad Request', error: 'Bad Request', message: ['Age must be at least 18 years old.'] }
+```
+
+And we're! You have created a custom validator in NestJS using <code>class-validator</code> & you can now create more complex validators to suit your needs.
+
+If you have any questions or feedback, feel free to reach out to me on [Twitter/X](https://twitter.com/ivstpn).
+
+Happy coding! 🚀

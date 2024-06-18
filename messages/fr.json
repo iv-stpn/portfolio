@@ -53,7 +53,7 @@
                 "content": "Ingénieur big data & machine learning de formation, je maîtrise les pipelines ETL avec la stack Apache. J'utilise plotly, R pour la data visualisation & TF/Keras pour le ML."
             },
             "web": {
-                "title": "Web Development",
+                "title": "Développement Web",
                 "content": "Full-Stack avec Expo/React Native & NestJS, Next.js 14 (app directory avec API Routes). Sensible à l'UX/UI, j'assiste dans la conception d'interfaces modernes & intuitifs."
             },
             "scraping": {
@@ -75,6 +75,12 @@
             "title": "Blog",
             "description": "Ivan Stepanian : Retrouvez ici mes derniers articles sur le développement web et l'ingénierie de données."
         }
+    },
+    "BlogPage": {
+        "published": "Publié le",
+        "lastUpdated": "Dernière modification le",
+        "recentPosts": "Articles récents",
+        "back": "Retourner au blog"
     },
     "Links": {
         "name": "Ivan Stepanian",

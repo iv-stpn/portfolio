@@ -1,0 +1,98 @@
+---
+title: "Symbols in JavaScript — What, Why, and How"
+publishedAt: "2024-05-25"
+summary: "Learn what symbols are in JavaScript, why they are useful, and how to use them in your code."
+image: /img/posts/symbols-in-javascript/cover.png
+---
+
+A common interview question for advanced JavaScript developers is: "What are symbols and how are they used?" - after reading this article, you'll be able to answer this question in any job interview!
+
+## What are symbols?
+
+Imagine you have a JavaScript object that can store keys that are arbitrarly added by processes outside of your control, and you want to ensure that can still access your own properties; if your key was overwritten, you would lose the original value:
+
+```javascript
+const obj = {};
+obj["myKey"] = "myValue"; // Your property
+
+function externalFunction(obj) {
+    obj.myKey = "overwrittenValue"; // Overwritten by an external process
+}
+
+externalFunction(obj);
+console.log(obj.myKey); // 'overwrittenValue'
+```
+
+This is where symbols come in. Introduced in the ECMAScript 6 (ES6) standard in 2015, symbols allow you to create unique and immutable (unchangeable) identifiers that can be used as object keys. They are created using the `Symbol` function:
+
+```javascript
+const mySymbol = Symbol("mySymbolDescription"); // <-- unique and immutable identifier
+obj[mySymbol] = "myValue";
+
+obj["mySymbol"] = "stringValue"; // <-- Strings will not overwrite symbols
+
+const tryingToOverwriteMySymbol = Symbol("mySymbolDescription"); // <-- though this symbol has the same description, it is a different symbol from `mySymbol`
+obj[tryingToOverwriteMySymbol] = "overwrittenValue"; // <-- New symbol, won't overwrite the original
+
+console.log(obj[mySymbol]); // 'myValue'
+console.log(obj.mySymbol); // 'stringValue'
+console.log(obj[tryingToOverwriteMySymbol]); // 'overwrittenValue'
+```
+
+That is why in TypeScript, you will see that `keyof any` is of type `string | number | symbol`, as strings, numbers and symbols are the only types that can be used as object keys.
+
+## Use cases for symbols
+
+Symbols were [originally](https://web.archive.org/web/20161027071049/http://wiki.ecmascript.org/doku.php?id=harmony:private_name_objects) intended to be used as private class members (i.e. properties that are only accessible within the context of the current instance of the class), but ended up being used to avoid property name collisions in objects. As such, Symbols **are not private** but are _collision-free_.
+
+Symbols are not enumerable, meaning they won't show up in `for...in` loops or `Object.keys`, but they still can be retrieved from objects via reflection by using the `Object.getOwnPropertySymbols` function:
+
+```javascript
+const obj = {};
+const mySymbol = Symbol("mySymbolDescription");
+obj[mySymbol] = "myValue";
+
+const symbols = Object.getOwnPropertySymbols(obj);
+console.log(symbols); // [Symbol(mySymbolDescription)]
+console.log(obj[symbols[0]]); // 'myValue'
+```
+
+So, even if you lose a reference to a symbol, you can still retrieve it from an object where it was used as a key.
+
+Symbols are most useful to make sure that internal properties and methods will not be accessed by mistake in external processes, ensuring libraries can use "magic" internal logic without it being overwritten by the user.
+
+The other use case of symbols is to just give an alternative key identifier to strings and numbers in cases where any arbitrary user value can be used as a key.
+
+You can create reusable (non-unique) symbols using `Symbol.for`, that will use symbols from a global registry and can be used anywhere in your code:
+
+```javascript
+const obj = {};
+
+const mySymbol = Symbol.for("mySymbolDescription");
+obj[mySymbol] = "myValue";
+
+const mySymbol2 = Symbol.for("mySymbolDescription");
+console.log(mySymbol === mySymbol2); // true
+
+obj[mySymbol2] = "overwrittenValue";
+console.log(obj[mySymbol]); // 'overwrittenValue'
+```
+
+If needed, you can also get back the key description of a symbol using the `Symbol.keyFor` function:
+
+```javascript
+const mySymbol = Symbol.for("mySymbolDescription");
+console.log(Symbol.keyFor(mySymbol)); // 'mySymbolDescription'
+```
+
+Some global symbols are used internally by JavaScript engines and are called "well-known symbols". There is for example `Symbol.iterator` that is used to define an iterator for an object, and `Symbol.hasInstance` that is used to define a custom `instanceof` behavior for an object.
+
+You can find the full list in the [MDN documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol#static_properties).
+
+And that's about it! Though seldom used, symbols can be a powerful tool to avoid property name collisions and encapsulate internal logic in advanced JavaScript applications.
+
+You can now confidently answer the question "What are symbols?" in your next job interview!
+
+If you have any questions or comments, feel free to reach out to me on [Twitter](https://twitter.com/ivanstepanian)!
+
+Happy coding! 🚀

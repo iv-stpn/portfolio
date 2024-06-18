@@ -20,10 +20,12 @@ export default function LanguageSwitch() {
                 const url = pathname.replace(new RegExp(`^/${locale}`), `/${key}`);
                 const href = searchParams ? `${url}?${searchParams}` : url;
                 return (
-                    <Link className="relative font-medium" key={key} href={href} locale={false}>
-                        {value}
-                        {locale === key && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
-                    </Link>
+                    <h4>
+                        <Link className="relative font-medium" key={key} href={href} locale={false}>
+                            {value}
+                            {locale === key && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+                        </Link>
+                    </h4>
                 );
             })}
         </div>

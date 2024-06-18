@@ -73,8 +73,6 @@
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --sh-class: #4c97f8;
-        --sh-identifier: white;
         --sh-keyword: #f47067;
         --sh-string: #0fa295;
     }
@@ -111,6 +109,15 @@ body {
         "case" 1,
         "ss07" 1,
         "cv11" 1;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: var(--font-figtree);
 }
 
 .nums {

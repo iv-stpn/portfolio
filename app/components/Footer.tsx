@@ -24,12 +24,12 @@ export default function Footer() {
                 <h1 className="title">Ivan Stepanian</h1>
             </div>
             {/* <div className="contained pad-screen mb-10">
-                <h2 className="opacity-50">Ma mission</h2>
+                <h2 className="opacity-65">Ma mission</h2>
                 <p></p>
             </div> */}
             <div className="contained pad-screen flex flex-col md:flex-row gap-16 lg:gap-24 mb-16">
                 <div>
-                    <h2 className="opacity-50 mb-2">{t("social")}</h2>
+                    <h2 className="opacity-65 mb-2">{t("social")}</h2>
                     <ul>
                         <li>
                             <UnderlineLink href={t("linkedin")} external>
@@ -49,7 +49,7 @@ export default function Footer() {
                     </ul>
                 </div>
                 <div>
-                    <h2 className="opacity-50 mb-2">{t("contact")}</h2>
+                    <h2 className="opacity-65 mb-2">{t("contact")}</h2>
                     <ul>
                         <li>
                             <UnderlineLink href={t("mailto")} external>
@@ -67,7 +67,7 @@ export default function Footer() {
                     </ul>
                 </div>
                 <div>
-                    <h2 className="opacity-50 mb-2">{t("legal")}</h2>
+                    <h2 className="opacity-65 mb-2">{t("legal")}</h2>
                     <ul>
                         <li>
                             {t("company")} {t("company-vat")}
@@ -82,7 +82,7 @@ export default function Footer() {
                 </div>
             </div>
             <div className="contained pad-screen">
-                <p className="opacity-50">{t("creator")}</p>
+                <h2 className="opacity-65">{t("creator")}</h2>
                 <div>
                     {t.rich("license", {
                         repository: (children) => <ExternalLink href={t("repository")}>{children}</ExternalLink>,
