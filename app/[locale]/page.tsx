@@ -13,7 +13,7 @@ import LogoMarquee from "./_elements/LogoMarquee";
 import { getBlogPosts } from "./blog/utils";
 
 const expandingArrow = (
-    <div className="w-10 group-hover:w-16 transition-[color,width] duration-[300ms] text-dark dark:text-white dark:group-hover:text-primary overflow-hidden whitespace-nowrap text-right">
+    <div className="w-10 group-hover:w-14 transition-[color,width] duration-[300ms] text-dark dark:text-white dark:group-hover:text-primary overflow-hidden whitespace-nowrap text-right">
         <span className="float-right">
             <span className="-mr-1">&lt;---</span>
             <span className="-ml-1">--&gt;</span>
