@@ -6,7 +6,7 @@ export type ArticleCardProps = { article: Article };
 export default async function ArticleCard({ article }: Readonly<ArticleCardProps>) {
     const locale = useLocale();
     return (
-        <Link href={`${locale}/blog/${article.slug}`}>
+        <Link href={`/${locale}/blog/${article.slug}`}>
             <article className="flex flex-col shrink-0 border border-dark/15 dark:border-white/15 h-full cursor-pointer rounded-2xl overflow-hidden">
                 <img src={article.metadata.image} alt={article.metadata.title} />
                 <div className="flex flex-col gap-2 p-8 lg:p-6">
