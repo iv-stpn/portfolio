@@ -24,7 +24,7 @@
     }
 
     .title {
-        @apply text-[2.5rem] llg:text-5xl !leading-snug tracking-tight;
+        @apply text-[2.35rem] !leading-snug tracking-tight;
     }
 }
 

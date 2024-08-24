@@ -5,6 +5,7 @@ export default {
         extend: {
             fontFamily: {
                 mono: ["var(--font-fira-code)"],
+                title: ["var(--font-figtree)"],
             },
             fontSize: {
                 xll: "1.375rem",

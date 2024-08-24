@@ -4,6 +4,7 @@ import Carousel from "app/components/carousel/Carousel";
 import ExternalLink from "app/components/common/ExternalLink";
 import Tag from "app/components/common/Tag";
 import TitleList from "app/components/list/TitleList";
+import { resumeLink } from "app/utils/constants";
 import clsx from "clsx";
 import { useLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
@@ -111,7 +112,7 @@ export default async function IndexPage() {
                 <section className="pad-screen mt-12 md:mt-24">
                     <div className="flex flex-col-reverse gap-6 xss:flex-row justify-between sm:items-center">
                         <div>
-                            <h1 className="title">{tIndex.rich("titles.home", { br })}</h1>
+                            <h1 className="title !text-[2.85rem]">{tIndex.rich("titles.home", { br })}</h1>
                             <div className="ssm:hidden mt-6">{tagList}</div>
                             <div className="mt-6 hidden ssm:block">{links}</div>
                         </div>
@@ -188,7 +189,7 @@ export default async function IndexPage() {
                     <div>{tIndex("contact.know-more")}</div>
                     <div className="flex flex-col md:flex-row">
                         <LinkBlock
-                            href="/Ivan%20Stepanian%20Resume%202024.pdf"
+                            href={resumeLink}
                             label={tIndex("contact.resume")}
                             className="md:basis-[50%]"
                             external
